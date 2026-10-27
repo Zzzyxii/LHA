@@ -1,0 +1,22 @@
+{
+ "axis_names": [
+  "production_value",
+  "costume_ornament",
+  "cinematic_light",
+  "color_grade",
+  "material_detail",
+  "set_detail",
+  "headwear",
+  "jewelry",
+  "atmosphere",
+  "skin_finish",
+  "texture_richness",
+  "warm_key",
+  "wealth"
+ ],
+ "arms": [
+  "direct_intent",
+  "g0"
+ ],
+ "n_samples": 50
+}

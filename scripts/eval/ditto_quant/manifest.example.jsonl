@@ -1,0 +1,2 @@
+{"sample_id":"demo_000","method":"ours","source_video":"/abs/path/to/source_000.mp4","edited_video":"/abs/path/to/ours_000.mp4","instruction":"Render it in the style of pixel art."}
+{"sample_id":"demo_000","method":"baseline","source_video":"/abs/path/to/source_000.mp4","edited_video":"/abs/path/to/baseline_000.mp4","instruction":"Render it in the style of pixel art."}

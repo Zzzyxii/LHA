@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""Minimal ffprobe shim backed by PyAV.
+
+This image ships ffmpeg (bundled by imageio-ffmpeg) but no ffprobe, while the
+repo shells out to ffprobe in two fixed shapes:
+
+  ffprobe -v error -select_streams v:0 \
+    -show_entries stream=width,height,avg_frame_rate,nb_frames -of json FILE
+  ffprobe -v error -show_entries format=duration \
+    -of default=noprint_wrappers=1:nokey=1 FILE
+
+Only those two are implemented; anything else exits non-zero so callers fall back
+instead of silently reading wrong metadata.
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+
+import av
+
+
+def _target_path(argv: list[str]) -> str:
+    # The file is the sole non-flag token that is not a flag's value.
+    flags_with_values = {"-v", "-select_streams", "-show_entries", "-of", "-loglevel"}
+    index = 0
+    candidates: list[str] = []
+    while index < len(argv):
+        token = argv[index]
+        if token in flags_with_values:
+            index += 2
+            continue
+        if token.startswith("-"):
+            index += 1
+            continue
+        candidates.append(token)
+        index += 1
+    if not candidates:
+        raise SystemExit("ffprobe shim: no input file in arguments")
+    return candidates[-1]
+
+
+def _frame_count(container, stream) -> int:
+    if stream.frames:
+        return int(stream.frames)
+    # Containers without a frame count header need a decode pass.
+    count = sum(1 for _ in container.decode(video=0))
+    return count
+
+
+def main() -> int:
+    argv = sys.argv[1:]
+    joined = " ".join(argv)
+    path = _target_path(argv)
+
+    if "format=duration" in joined:
+        with av.open(path) as container:
+            duration = container.duration
+            if duration is not None:
+                print(f"{duration / av.time_base:.6f}")
+                return 0
+            stream = container.streams.video[0]
+            if stream.duration is not None and stream.time_base:
+                print(f"{float(stream.duration * stream.time_base):.6f}")
+                return 0
+        return 1
+
+    if "stream=" in joined:
+        with av.open(path) as container:
+            stream = container.streams.video[0]
+            rate = stream.average_rate or stream.base_rate
+            entry = {
+                "width": int(stream.codec_context.width),
+                "height": int(stream.codec_context.height),
+                "avg_frame_rate": f"{rate.numerator}/{rate.denominator}" if rate else "0/1",
+                "nb_frames": str(_frame_count(container, stream)),
+            }
+        print(json.dumps({"streams": [entry]}))
+        return 0
+
+    sys.stderr.write(f"ffprobe shim: unsupported invocation: {joined}\n")
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

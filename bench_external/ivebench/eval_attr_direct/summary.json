@@ -1,0 +1,15 @@
+{
+ "csv": "/apdcephfs_szcf/share_304169095/hunyuan/juliayxzhu/dev/tmpp/outt/bench_external/ivebench/eval_attr_direct/attr_direct_2026-10-26-07-13-29_eval_results.csv",
+ "n": 40,
+ "metrics": {
+  "overall_semantic_consistency_score": 0.23890795819461347,
+  "phrase_semantic_consistency_score": 0.18908508121967316,
+  "semantic_fidelity_score": 0.9155629947781563,
+  "temporal_flickering_score": 0.9692134819404126
+ },
+ "dimensions": {
+  "compliance": 0.2139965197071433,
+  "fidelity": 0.9155629947781563,
+  "quality": 0.9692134819404126
+ }
+}

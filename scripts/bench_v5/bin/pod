@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Run one shell command on the taiji H20 pod and print the gateway's response.
+# Usage: pod '<shell command>'
+set -uo pipefail
+SKILL_DIR=/apdcephfs_szcf/share_304169095/juliayxzhu/Tiny/skills/ref_skills/taiji-basic-platform-skills/sub-skills/instance-skill
+PAYLOAD=$(python3 -c '
+import json,sys
+print(json.dumps({"instance_id":"8b0fba19a0be2b9d01a0c881e92706fd",
+ "pod_name":"ts-8b0fba19a0be2b9d01a0c881e92706fd-launcher","command":sys.argv[1]}))' "$1")
+cd "$SKILL_DIR" || exit 1
+TAIJI_NO_HOT_RELOAD=1 python3 scripts/connect_mcp.py call exec_hunyuan_train_instance_command "$PAYLOAD"

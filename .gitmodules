@@ -1,0 +1,12 @@
+[submodule "CCEdit"]
+	path = CCEdit
+	url = https://github.com/RuoyuFeng/CCEdit.git
+[submodule "Ditto"]
+	path = Ditto
+	url = https://github.com/Shiying-Zhang/Ditto.git
+[submodule "bench_external/ivebench_code"]
+	path = bench_external/ivebench_code
+	url = https://github.com/RyanChenYN/IVEBench.git
+[submodule "reference"]
+	path = reference
+	url = https://huggingface.co/datasets/Ouzhang/low-high-reference

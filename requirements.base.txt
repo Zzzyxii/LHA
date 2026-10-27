@@ -1,0 +1,28 @@
+# Core runtime
+torch>=2.0.0
+torchvision
+pydantic
+
+# VLM / planner / critic
+transformers
+accelerate
+sentencepiece
+protobuf
+safetensors
+einops
+qwen-vl-utils
+
+# Video / image IO
+imageio
+imageio[ffmpeg]
+pillow
+
+# Ditto / DiffSynth runtime
+modelscope
+ftfy
+pynvml
+peft
+
+# Data utilities
+pandas
+datasets

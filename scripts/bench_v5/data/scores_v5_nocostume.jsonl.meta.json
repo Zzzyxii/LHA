@@ -1,0 +1,23 @@
+{
+ "axis_names": [
+  "production_value",
+  "cinematic_light",
+  "color_grade",
+  "material_detail",
+  "set_detail",
+  "headwear",
+  "jewelry",
+  "atmosphere",
+  "skin_finish",
+  "texture_richness",
+  "warm_key",
+  "wealth"
+ ],
+ "arms": [
+  "noop",
+  "oracle",
+  "direct_intent",
+  "grounded_v4"
+ ],
+ "n_samples": 50
+}

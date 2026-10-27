@@ -1,0 +1,15 @@
+{
+ "csv": "/data/ive_eval_src_anchor/src_anchor_2026-10-25-16-48-32_eval_results.csv",
+ "n": 48,
+ "metrics": {
+  "overall_semantic_consistency_score": 0.2363381469622254,
+  "phrase_semantic_consistency_score": 0.1209856932982802,
+  "semantic_fidelity_score": 1.0000000173846881,
+  "temporal_flickering_score": 0.9667681014519903
+ },
+ "dimensions": {
+  "compliance": 0.1786619201302528,
+  "fidelity": 1.0000000173846881,
+  "quality": 0.9667681014519903
+ }
+}

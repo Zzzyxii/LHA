@@ -1,0 +1,15 @@
+{
+ "csv": "bench_external/ivebench/eval_attr_skill/attr_skill_2026-10-26-09-33-43_eval_results.csv",
+ "n": 40,
+ "metrics": {
+  "overall_semantic_consistency_score": 0.23967071250081062,
+  "phrase_semantic_consistency_score": 0.19236608482897277,
+  "semantic_fidelity_score": 0.9171636402606964,
+  "temporal_flickering_score": 0.9719605109982938
+ },
+ "dimensions": {
+  "compliance": 0.2160183986648917,
+  "fidelity": 0.9171636402606964,
+  "quality": 0.9719605109982938
+ }
+}

@@ -1,0 +1,15 @@
+{
+ "csv": "/apdcephfs_szcf/share_304169095/hunyuan/juliayxzhu/dev/tmpp/outt/bench_external/ivebench/eval_skill/skill_2026-10-26-05-33-06_eval_results.csv",
+ "n": 48,
+ "metrics": {
+  "overall_semantic_consistency_score": 0.23003196281691393,
+  "phrase_semantic_consistency_score": 0.1511483777624865,
+  "semantic_fidelity_score": 0.8235517125576735,
+  "temporal_flickering_score": 0.9666743077420786
+ },
+ "dimensions": {
+  "compliance": 0.1905901702897002,
+  "fidelity": 0.8235517125576735,
+  "quality": 0.9666743077420786
+ }
+}

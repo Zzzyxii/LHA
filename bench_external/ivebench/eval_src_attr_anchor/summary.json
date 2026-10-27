@@ -1,0 +1,15 @@
+{
+ "csv": "/apdcephfs_szcf/share_304169095/hunyuan/juliayxzhu/dev/tmpp/outt/bench_external/ivebench/eval_src_attr_anchor/src_attr_anchor_2026-10-26-07-36-35_eval_results.csv",
+ "n": 40,
+ "metrics": {
+  "overall_semantic_consistency_score": 0.2445767428725958,
+  "phrase_semantic_consistency_score": 0.1845925774425268,
+  "semantic_fidelity_score": 0.9999999761581421,
+  "temporal_flickering_score": 0.968523031843851
+ },
+ "dimensions": {
+  "compliance": 0.21458466015756128,
+  "fidelity": 0.9999999761581421,
+  "quality": 0.968523031843851
+ }
+}

@@ -1,0 +1,252 @@
+from __future__ import annotations
+
+import json
+import os
+from copy import deepcopy
+from functools import lru_cache
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_MEMORY_CONFIG_PATH = PROJECT_ROOT / "configs" / "memory.json"
+
+DEFAULT_MEMORY_POLICY = {
+    "runtime": {
+        "mode": "explicit",
+        "critic_mode": "",
+        "edit_mode": "",
+    },
+    "implicit": {
+        "state": {
+            "short_window": 3,
+            "mid_ema_decay": 0.7,
+            "long_max_prototypes": 64,
+            "prototype_dim": 256,
+        },
+        "reset": {
+            "hard_reset_on_global_replan": True,
+            "hard_reset_on_family_change": True,
+            "hard_reset_on_archetype_change": True,
+            "soft_reset_on_repeated_local_failure": True,
+            "repeated_local_failure_threshold": 2,
+        },
+        "fusion": {
+            "explicit_weight": 1.0,
+            "implicit_weight": 1.0,
+            "conflict_policy": "sum",
+        },
+        "edit": {
+            "preserve_weight": 1.0,
+            "repair_weight": 1.0,
+            "style_weight": 1.0,
+            "seed_reuse_bias": 0.35,
+            "variant_rerank_bonus": 0.2,
+            "steps_delta": 2,
+            "denoise_delta": 0.05,
+            "hidden_state": {
+                "enabled": True,
+                "block_indices": [],
+                "capture_block_index": -1,
+                "capture_ema_decay": 0.8,
+                "residual_scale": 0.04,
+                "positive_weight": 1.0,
+                "negative_weight": 1.0,
+                "style_weight": 1.0,
+                "positive_topk": 2,
+                "negative_topk": 2,
+                "similarity_floor": 0.05,
+                "max_entries_per_bank": 8,
+                "max_vector_dim": 0,
+                "include_global_positive_fallback": True,
+                "positive_score_threshold": 0.62,
+                "scale_weights": {
+                    "short": 1.0,
+                    "mid": 0.7,
+                    "long": 0.5,
+                },
+            },
+        },
+        "critic": {
+            "history_window": 3,
+            "memory_slots": 4,
+            "use_teacher_explicit_context": True,
+        },
+    },
+    "stats": {
+        "recency_decay": 0.85,
+    },
+    "source_quality": {
+        "analysis_stage_custom": 0.86,
+        "candidate_stage_custom": 0.79,
+        "materialized_selected_skill": 0.94,
+        "attempt_materialized": 0.92,
+        "attempt_custom": 0.88,
+        "memory_custom": 0.8,
+        "memory_runtime": 0.84,
+        "default": 0.75,
+    },
+    "promotion": {
+        "promotable": {
+            "require_accepted": True,
+            "min_overall_score": 0.72,
+            "min_carrier_grounding": 0.5,
+            "min_quality_score": 0.62,
+            "blocked_failure_tags": ["identity_drift", "artifact_heavy", "detached_fx"],
+        }
+    },
+    "retrieval": {
+        "collection_base_weights": {
+            "scene_archetypes": 1.0,
+            "failure_patterns": 1.25,
+            "style_convertibility_priors": 1.1,
+            "model_behavior_priors": 0.9,
+            "prompt_compilation_recipes": 1.35,
+            "promotable_skill_records": 1.25,
+            "custom_skill_records": 1.1,
+            "runtime_skill_records": 1.2,
+            "quarantined_skill_records": 1.15,
+            "skill_execution_records": 1.0,
+            "skill_execution_summaries": 1.0,
+        },
+        "collection_limits": {
+            "scene_archetypes": {"top_k": 3, "min_score": 0.0},
+            "failure_patterns": {"top_k": 5, "min_score": 0.0},
+            "style_convertibility_priors": {"top_k": 5, "min_score": 0.0},
+            "model_behavior_priors": {"top_k": 5, "min_score": 0.0},
+            "prompt_compilation_recipes": {"top_k": 5, "min_score": 0.0},
+            "promotable_skill_records": {"top_k": 8, "min_score": 0.0},
+            "custom_skill_records": {"top_k": 8, "min_score": 0.0},
+            "runtime_skill_records": {"top_k": 8, "min_score": 0.0},
+            "quarantined_skill_records": {"top_k": 12, "min_score": 0.0},
+            "skill_execution_records": {"top_k": 24, "min_score": 0.0},
+            "skill_execution_summaries": {"top_k": 16, "min_score": 0.0},
+        },
+        "scoring": {
+            "count_divisor": 15.0,
+            "count_cap": 0.3,
+            "evidence_multiplier": 0.25,
+            "evidence_cap": 0.25,
+            "success_multiplier": 0.2,
+            "success_cap": 0.2,
+            "recency_divisor": 4.0,
+            "recency_input_cap": 1.0,
+            "recency_multiplier": 0.15,
+            "source_quality_multiplier": 0.12,
+            "source_quality_cap": 0.12,
+        },
+        "runtime_selection": {
+            "limit": 5,
+        },
+        "structured_bonus": {
+            "family_match": 0.35,
+            "family_mismatch_penalty": 0.18,
+            "archetype_match": 0.4,
+            "archetype_risk_penalty": 0.35,
+            "archetype_specific_mismatch_penalty": 0.08,
+            "carrier_overlap_step": 0.15,
+            "carrier_overlap_cap": 0.45,
+            "anchor_overlap_step": 0.1,
+            "anchor_overlap_cap": 0.35,
+        },
+        "runtime_scoring": {
+            "good_carrier_base": 0.25,
+            "good_carrier_step": 0.12,
+            "good_carrier_cap": 0.6,
+            "bad_carrier_base": 0.35,
+            "bad_carrier_step": 0.15,
+            "bad_carrier_cap": 0.8,
+            "historical_skill_bias_scale": 0.35,
+            "historical_skill_bias_cap": 0.8,
+            "attempt_materialized_base": 3.0,
+            "attempt_custom_base": 2.6,
+            "runtime_record_base": 1.2,
+            "runtime_accepted_bonus": 0.35,
+            "runtime_overall_multiplier": 0.45,
+            "runtime_quality_multiplier": 0.4,
+            "promotable_base": 1.0,
+            "promotable_accepted_bonus": 0.5,
+            "promotable_overall_multiplier": 0.5,
+            "promotable_quality_multiplier": 0.45,
+            "analysis_stage_source_bonus": 0.2,
+        },
+        "execution_bias": {
+            "preferred_carrier_threshold": 0.35,
+            "forbidden_carrier_threshold": -0.1,
+            "boosted_skill_threshold": 0.25,
+            "penalized_skill_threshold": -0.05,
+        },
+    },
+    "cleanup": {
+        "retention_score": {
+            "quality_score_weight": 0.35,
+            "success_rate_weight": 0.2,
+            "evidence_score_weight": 0.15,
+            "recency_weight_weight": 0.15,
+            "recency_weight_divisor": 4.0,
+            "recency_weight_cap": 1.0,
+            "sample_count_weight": 0.1,
+            "sample_count_divisor": 10.0,
+            "sample_count_cap": 1.0,
+            "source_quality_weight": 0.05,
+            "accepted_bonus": 0.05,
+        },
+        "collections": {
+            "scene_archetypes": {"max_items": 128, "stale_after_days": 365, "keep_at_least": 16},
+            "style_convertibility_priors": {"max_items": 256, "stale_after_days": 300, "min_recency_weight": 0.05, "keep_at_least": 24},
+            "model_behavior_priors": {"max_items": 128, "stale_after_days": 300, "min_recency_weight": 0.05, "keep_at_least": 16},
+            "failure_patterns": {"max_items": 256, "stale_after_days": 240, "min_recency_weight": 0.05, "keep_at_least": 24},
+            "prompt_compilation_recipes": {"max_items": 192, "stale_after_days": 240, "min_evidence_score": 0.2, "keep_at_least": 20},
+            "custom_skill_records": {"max_items": 800, "stale_after_days": 240, "min_recency_weight": 0.05, "min_quality_score": 0.2, "keep_at_least": 48},
+            "runtime_skill_records": {"max_items": 320, "stale_after_days": 240, "min_quality_score": 0.25, "keep_at_least": 32},
+            "promotable_skill_records": {"max_items": 320, "stale_after_days": 400, "min_success_rate": 0.35, "min_quality_score": 0.45, "keep_at_least": 32},
+            "quarantined_skill_records": {"max_items": 240, "stale_after_days": 180, "min_recency_weight": 0.02, "keep_at_least": 24},
+            "skill_execution_records": {"max_items": 1600, "stale_after_days": 220, "min_recency_weight": 0.02, "keep_at_least": 128},
+            "skill_execution_summaries": {"max_items": 256, "stale_after_days": 320, "min_sample_count": 1, "keep_at_least": 32},
+            "run_records": {"max_items": 300, "stale_after_days": 180, "keep_at_least": 64},
+            "evaluation_records": {"max_items": 400, "stale_after_days": 180, "keep_at_least": 80},
+            "evolution_records": {"max_items": 400, "stale_after_days": 180, "keep_at_least": 80},
+        }
+    },
+}
+
+
+def _merge_dict(base: dict, override: dict) -> dict:
+    merged = deepcopy(base)
+    for key, value in (override or {}).items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = _merge_dict(merged[key], value)
+        else:
+            merged[key] = deepcopy(value)
+    return merged
+
+
+def _resolve_config_path(config_path: str | Path | None = None) -> Path:
+    if config_path:
+        return Path(config_path).expanduser().resolve()
+    env_path = os.environ.get("LOW_HIGH_MEMORY_CONFIG", "").strip()
+    if env_path:
+        return Path(env_path).expanduser().resolve()
+    return DEFAULT_MEMORY_CONFIG_PATH.resolve()
+
+
+@lru_cache(maxsize=8)
+def _load_memory_policy_cached(resolved_path: str) -> dict:
+    path = Path(resolved_path)
+    policy = deepcopy(DEFAULT_MEMORY_POLICY)
+    if path.exists():
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            policy = _merge_dict(policy, payload)
+    return policy
+
+
+def load_memory_policy(config_path: str | Path | None = None) -> dict:
+    resolved = str(_resolve_config_path(config_path))
+    return deepcopy(_load_memory_policy_cached(resolved))
+
+
+def load_memory_runtime_config(config_path: str | Path | None = None) -> dict:
+    policy = load_memory_policy(config_path)
+    runtime = deepcopy(policy.get("runtime", {}) or {})
+    runtime["implicit"] = deepcopy(policy.get("implicit", {}) or {})
+    return runtime

@@ -1,0 +1,251 @@
+{
+  "_doc": "bench_v3 evaluation plan. Paths are relative to the repo root unless absolute; {SRC_TOP50}/{HIGH_TOP50} expand from 'dirs'. 'gt' = run gt_metrics (tiers whose samples have a target video). 'pairwise' = [arm_a, arm_b] comparisons that differ in one variable. An arm is evaluated only once its dir covers every task sample (missing or incomplete arms are skipped). Every judge stage runs once per entry in 'judges'; the first is primary (<tier>.checklist / <tier>.pairwise), the others write <tier>.<stage>@<model>. adv_recolor / adv_swap are adversarial controls (make_adversarial.py) that a sound judge must score badly. Conclusions should only rest on verdicts both judges agree on. The agent under test (planner/translator) is gemini-3.8-flash, so gemini is reported but excluded from 'consensus_judges': headline conclusions use the non-gemini judges' consensus.",
+  "judges": [
+    "gemini-3.8-flash",
+    "gpt-5.6-luna",
+    "claude-sonnet-5"
+  ],
+  "dirs": {
+    "SRC_TOP50": "reports/top50_video_bundle_20260725_nodup/videos/source_low",
+    "HIGH_TOP50": "/apdcephfs_szcf/share_304169095/hunyuan/juliayxzhu/dev/归档_extract/target_high"
+  },
+  "tiers": {
+    "track_a.t1": {
+      "gt": true,
+      "arms": {
+        "noop": "{SRC_TOP50}",
+        "oracle": "{HIGH_TOP50}",
+        "t1_direct": "out/bench_v2/planning/ours_intent_direct/generations",
+        "t1_agent": "out/bench_v2/ablation/ours_abl_plan_only/generations",
+        "t1_agent_skill": "out/bench_v2/ablation/ours_abl_agentprompt/generations",
+        "t1_agent_orig": "out/bench_v2/planning/ours_intent_agent/generations",
+        "t3_expert": "out/bench_skill/run50_native/ours_raw/generations",
+        "t1_agent_s1055": "out/bench_v3/runs/track_a.t1_seed1055/ours_t1_agent/generations",
+        "t1_agent_s2068": "out/bench_v3/runs/track_a.t1_seed2068/ours_t1_agent/generations",
+        "adv_recolor": "out/bench_v3/eval/_adv_recolor",
+        "adv_swap": "out/bench_v3/eval/_adv_swap",
+        "t1_agent_fresh": "out/bench_v3/runs/track_a.t1_fresh/ours_t1_agent/generations",
+        "t1_direct_s1055": "out/bench_v3/runs/track_a.t1_seed1055/ours_t1_direct/generations",
+        "t1_direct_s2068": "out/bench_v3/runs/track_a.t1_seed2068/ours_t1_direct/generations",
+        "bernini_t1_direct": "out/bench_v3/runs/track_a.t1_bernini_v3/bernini_t1_direct/generations",
+        "bernini_t1_agent": "out/bench_v3/runs/track_a.t1_bernini_v3/bernini_t1_agent/generations"
+      },
+      "pairwise": [
+        [
+          "t1_agent",
+          "t1_direct"
+        ],
+        [
+          "t1_agent_fresh",
+          "t1_direct"
+        ],
+        [
+          "bernini_t1_agent",
+          "bernini_t1_direct"
+        ],
+        [
+          "noop",
+          "t1_agent_fresh"
+        ],
+        [
+          "oracle",
+          "t1_agent_fresh"
+        ]
+      ]
+    },
+    "track_a.t2_same": {
+      "gt": true,
+      "arms": {
+        "noop": "{SRC_TOP50}",
+        "oracle": "{HIGH_TOP50}",
+        "t1_direct": "out/bench_v2/planning/ours_intent_direct/generations",
+        "t2_direct_ref": "out/bench_v3/runs/track_a.t2_same/ours_t2_direct_ref/generations",
+        "t2_agent": "out/bench_v3/runs/track_a.t2_same/ours_t2_agent/generations",
+        "t2_agent_ref": "out/bench_v3/runs/track_a.t2_same/ours_t2_agent_ref/generations"
+      },
+      "pairwise": [
+        [
+          "t2_agent_ref",
+          "t2_direct_ref"
+        ],
+        [
+          "t2_agent_ref",
+          "t2_agent"
+        ],
+        [
+          "t2_agent",
+          "t2_direct_ref"
+        ]
+      ]
+    },
+    "track_a.t2_cross": {
+      "gt": true,
+      "arms": {
+        "noop": "{SRC_TOP50}",
+        "oracle": "{HIGH_TOP50}",
+        "t1_direct": "out/bench_v2/planning/ours_intent_direct/generations",
+        "t2_direct_ref": "out/bench_v3/runs/track_a.t2_cross/ours_t2_direct_ref/generations",
+        "t2_agent": "out/bench_v3/runs/track_a.t2_cross/ours_t2_agent/generations",
+        "t2_agent_ref": "out/bench_v3/runs/track_a.t2_cross/ours_t2_agent_ref/generations"
+      },
+      "pairwise": [
+        [
+          "t2_agent_ref",
+          "t2_direct_ref"
+        ],
+        [
+          "t2_agent_ref",
+          "t2_agent"
+        ],
+        [
+          "t2_agent",
+          "t2_direct_ref"
+        ]
+      ]
+    },
+    "track_a.t3": {
+      "gt": true,
+      "arms": {
+        "noop": "{SRC_TOP50}",
+        "oracle": "{HIGH_TOP50}",
+        "t3_expert": "out/bench_skill/run50_native/ours_raw/generations",
+        "t3_bernini": "out/bench_skill/run50_native/bernini_raw/generations",
+        "t3_skill_v1": "out/bench_skill/run50_native/ours_skill/generations",
+        "t1_direct": "out/bench_v2/planning/ours_intent_direct/generations",
+        "t1_agent": "out/bench_v2/ablation/ours_abl_plan_only/generations",
+        "t2_same_direct_ref": "out/bench_v3/runs/track_a.t2_same/ours_t2_direct_ref/generations",
+        "t2_same_agent": "out/bench_v3/runs/track_a.t2_same/ours_t2_agent/generations",
+        "t2_same_agent_ref": "out/bench_v3/runs/track_a.t2_same/ours_t2_agent_ref/generations",
+        "t2_cross_direct_ref": "out/bench_v3/runs/track_a.t2_cross/ours_t2_direct_ref/generations",
+        "t2_cross_agent": "out/bench_v3/runs/track_a.t2_cross/ours_t2_agent/generations",
+        "t2_cross_agent_ref": "out/bench_v3/runs/track_a.t2_cross/ours_t2_agent_ref/generations",
+        "t3_expert_s1055": "out/bench_v3/runs/track_a.t3_seed1055/ours_t3_direct/generations",
+        "t3_expert_s2068": "out/bench_v3/runs/track_a.t3_seed2068/ours_t3_direct/generations",
+        "t1_agent_s1055": "out/bench_v3/runs/track_a.t1_seed1055/ours_t1_agent/generations",
+        "t1_agent_s2068": "out/bench_v3/runs/track_a.t1_seed2068/ours_t1_agent/generations",
+        "adv_recolor": "out/bench_v3/eval/_adv_recolor",
+        "adv_swap": "out/bench_v3/eval/_adv_swap",
+        "t1_agent_fresh": "out/bench_v3/runs/track_a.t1_fresh/ours_t1_agent/generations"
+      },
+      "pairwise": [
+        [
+          "t3_bernini",
+          "t3_expert"
+        ],
+        [
+          "t1_agent",
+          "t1_direct"
+        ],
+        [
+          "t2_same_agent",
+          "t2_same_direct_ref"
+        ],
+        [
+          "t2_cross_agent",
+          "t2_cross_direct_ref"
+        ]
+      ]
+    },
+    "ditto_track.t1": {
+      "gt": true,
+      "arms": {
+        "noop": "{SRC_TOP50}",
+        "oracle": "{HIGH_TOP50}",
+        "t1_direct": "out/bench_v3/runs/ditto_track.t1/ours_t1_direct/generations",
+        "t1_agent": "out/bench_v3/runs/ditto_track.t1/ours_t1_agent/generations",
+        "t1_direct_s1055": "out/bench_v3/runs/ditto_track.t1_seed1055/ours_t1_direct/generations",
+        "t1_agent_s1055": "out/bench_v3/runs/ditto_track.t1_seed1055/ours_t1_agent/generations"
+      },
+      "pairwise": [
+        [
+          "t1_agent",
+          "t1_direct"
+        ]
+      ]
+    },
+    "ditto_track.t2": {
+      "gt": true,
+      "arms": {
+        "noop": "{SRC_TOP50}",
+        "oracle": "{HIGH_TOP50}",
+        "t2_direct_ref": "out/bench_v3/runs/ditto_track.t2/ours_t2_direct_ref/generations",
+        "t2_agent": "out/bench_v3/runs/ditto_track.t2/ours_t2_agent/generations",
+        "t2_agent_ref": "out/bench_v3/runs/ditto_track.t2/ours_t2_agent_ref/generations"
+      },
+      "pairwise": [
+        [
+          "t2_agent",
+          "t2_direct_ref"
+        ],
+        [
+          "t2_agent_ref",
+          "t2_direct_ref"
+        ],
+        [
+          "t2_agent_ref",
+          "t2_agent"
+        ]
+      ]
+    },
+    "ditto_track.t3": {
+      "gt": true,
+      "arms": {
+        "noop": "{SRC_TOP50}",
+        "oracle": "{HIGH_TOP50}",
+        "t3_direct": "out/bench_v3/runs/ditto_track.t3/ours_t3_direct/generations",
+        "t1_direct": "out/bench_v3/runs/ditto_track.t1/ours_t1_direct/generations",
+        "t1_agent": "out/bench_v3/runs/ditto_track.t1/ours_t1_agent/generations",
+        "t2_direct_ref": "out/bench_v3/runs/ditto_track.t2/ours_t2_direct_ref/generations",
+        "t2_agent": "out/bench_v3/runs/ditto_track.t2/ours_t2_agent/generations",
+        "t2_agent_ref": "out/bench_v3/runs/ditto_track.t2/ours_t2_agent_ref/generations"
+      },
+      "pairwise": []
+    },
+    "style_track.t1": {
+      "gt": false,
+      "arms": {
+        "noop": "out/bench_v3/eval/_style_noop",
+        "t1_direct": "out/bench_v3/runs/style_track.t1/ours_t1_direct/generations",
+        "t1_agent": "out/bench_v3/runs/style_track.t1/ours_t1_agent/generations",
+        "t1_direct_s1055": "out/bench_v3/runs/style_track.t1_seed1055/ours_t1_direct/generations",
+        "t1_agent_s1055": "out/bench_v3/runs/style_track.t1_seed1055/ours_t1_agent/generations"
+      },
+      "pairwise": [
+        [
+          "t1_agent",
+          "t1_direct"
+        ]
+      ]
+    },
+    "style_track.t2": {
+      "gt": false,
+      "arms": {
+        "noop": "out/bench_v3/eval/_style_noop",
+        "t2_direct_ref": "out/bench_v3/runs/style_track.t2/ours_t2_direct_ref/generations",
+        "t2_agent": "out/bench_v3/runs/style_track.t2/ours_t2_agent/generations"
+      },
+      "pairwise": [
+        [
+          "t2_agent",
+          "t2_direct_ref"
+        ]
+      ]
+    },
+    "style_track.t3": {
+      "gt": false,
+      "arms": {
+        "noop": "out/bench_v3/eval/_style_noop",
+        "t3_direct": "out/bench_v3/runs/style_track.t3/ours_t3_direct/generations",
+        "t1_direct": "out/bench_v3/runs/style_track.t1/ours_t1_direct/generations",
+        "t1_agent": "out/bench_v3/runs/style_track.t1/ours_t1_agent/generations",
+        "t2_direct_ref": "out/bench_v3/runs/style_track.t2/ours_t2_direct_ref/generations",
+        "t2_agent": "out/bench_v3/runs/style_track.t2/ours_t2_agent/generations"
+      },
+      "pairwise": []
+    }
+  },
+  "consensus_judges": [
+    "gpt-5.6-luna",
+    "claude-sonnet-5"
+  ]
+}

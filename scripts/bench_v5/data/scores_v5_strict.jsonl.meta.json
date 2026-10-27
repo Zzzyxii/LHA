@@ -1,0 +1,19 @@
+{
+ "axis_names": [
+  "production_value",
+  "costume_ornament",
+  "color_grade",
+  "material_detail",
+  "set_detail",
+  "headwear",
+  "texture_richness",
+  "warm_key"
+ ],
+ "arms": [
+  "noop",
+  "oracle",
+  "direct_intent",
+  "grounded_v4"
+ ],
+ "n_samples": 50
+}

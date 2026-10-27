@@ -1,0 +1,5 @@
+{
+  "backend": "local_qwen_vl",
+  "max_frames": 6,
+  "max_candidates": 3
+}
